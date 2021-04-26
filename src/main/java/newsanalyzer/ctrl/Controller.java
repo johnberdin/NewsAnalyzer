@@ -54,7 +54,7 @@ public class Controller {
 
 
 		}catch(NewsApiException e){
-				System.out.println("--------Ein Fehler ist aufgetreten.--------");
+				System.out.println("\n--------Ein Fehler ist aufgetreten in der API. Url!! --------\n");
 				System.out.println("Die aktuellsten Nachrichten zu Covid (Österreich) werden angezeigt.");
 				NewsApi newsApi = new NewsApiBuilder()
 						.setApiKey("5aa68f2b27a44569822d37332719d59d")
