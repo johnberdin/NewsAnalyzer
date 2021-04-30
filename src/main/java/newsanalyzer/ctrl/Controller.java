@@ -13,7 +13,14 @@ import newsapi.NewsApiException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+
+
 public class Controller {
+
+
+	public static List<String> newsURLs = new ArrayList<String>();
+	public static List<String> imgURL = new ArrayList<String>();
 
 	public static final String APIKEY= "5aa68f2b27a44569822d37332719d59d";
 
@@ -31,6 +38,8 @@ public class Controller {
 					.setSourceCategory(segment)
 					.createNewsApi();
 
+
+
 			NewsReponse newsReponse = nachrichten.getNews();
 
 			if(newsReponse.getTotalResults()==0) //Wenn keine Nachrichten gefunden wird, dann kommt eine Fehlermeldung
@@ -41,7 +50,12 @@ public class Controller {
 				Article nachricht = articles.get(0);
 				System.out.println("\n***NACHRICHT***");
 				System.out.println("\n***" + nachricht.getTitle() + "*** --- " + nachricht.getPublishedAt() + "\n\n" + nachricht.getContent() + "\n\nUm die vollständige Nachricht zu lesen, gehen Sie auf: " + nachricht.getUrl()+"\n");
+
+				//die Links werden gespeichert
+				newsURLs.add(nachricht.getUrl());
+				imgURL.add(nachricht.getUrlToImage());
 			}
+
 
 			//TODO implement methods for analysis
 			System.out.println("---Analysis---");

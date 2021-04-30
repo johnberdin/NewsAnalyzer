@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import newsanalyzer.ctrl.Controller;
+import newsapi.Downloader;
 import newsapi.NewsApi;
 import newsapi.NewsApiBuilder;
+import newsapi.SequentialDownloader;
 import newsapi.beans.Article;
 import newsapi.beans.NewsReponse;
 import newsapi.enums.Category;
@@ -24,6 +26,8 @@ public class UserInterface
 {
 
 	private Controller ctrl = new Controller();
+
+	SequentialDownloader myDownloader = new SequentialDownloader();
 
 	public void getDataFromCtrl1(){
 
@@ -100,6 +104,13 @@ public class UserInterface
 		ctrl.process(keyword, thema); //die Nachrichten werden an den Controller geschickt für die Analyse etc.
 	}
 
+	public void downloadLastSearch(){
+		System.out.println("Heruntergeladen werden: ");
+		Controller.newsURLs.forEach(System.out::println);
+		myDownloader.process(Controller.newsURLs);
+
+	}
+
 
 	public void start() {
 		Menu<Runnable> menu = new Menu<>("User Interfacx");
@@ -108,6 +119,7 @@ public class UserInterface
 		menu.insert("b", "Aktuellste Nachricht zu Fußball (Österreich)", this::getDataFromCtrl2);
 		menu.insert("c", "Aktuellste Nachricht zu Bitcoin (Österreich)", this::getDataFromCtrl3);
 		menu.insert("d", "Aktuelleste Nachricht zum Thema deiner Wahl",this::getDataForCustomInput);
+		menu.insert("f", "Die letzte Suche herunterladen",this::downloadLastSearch);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
