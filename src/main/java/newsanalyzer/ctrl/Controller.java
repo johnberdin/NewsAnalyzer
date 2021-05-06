@@ -1,15 +1,15 @@
 package newsanalyzer.ctrl;
 
-import newsapi.NewsApi;
-import newsapi.NewsApiBuilder;
+import newsapi.*;
 import newsapi.beans.Article;
 import newsapi.beans.NewsReponse;
 import newsapi.enums.Category;
 import newsapi.enums.Country;
 import newsapi.enums.Endpoint;
 import newsapi.enums.SortBy;
-import newsapi.NewsApiException;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +23,8 @@ public class Controller {
 	public static List<String> imgURL = new ArrayList<String>();
 
 	public static final String APIKEY= "5aa68f2b27a44569822d37332719d59d";
+
+	public Downloader myDownloader;
 
 	public void process(String thema, Category segment) {
 		try { // DIE EXCEPTION IN EINE NEUE PACKEN
@@ -47,13 +49,20 @@ public class Controller {
 
 			if (newsReponse != null) {
 				List<Article> articles = newsReponse.getArticles();
-				Article nachricht = articles.get(0);
+				Article nachricht = articles.get(0); //die aktuellste Nachricht
 				System.out.println("\n***NACHRICHT***");
 				System.out.println("\n***" + nachricht.getTitle() + "*** --- " + nachricht.getPublishedAt() + "\n\n" + nachricht.getContent() + "\n\nUm die vollständige Nachricht zu lesen, gehen Sie auf: " + nachricht.getUrl()+"\n");
 
 				//die Links werden gespeichert
-				newsURLs.add(nachricht.getUrl());
-				imgURL.add(nachricht.getUrlToImage());
+
+				newsURLs = articles
+						.stream()
+						.filter(article -> Objects.nonNull(article.getUrl()))
+						.map(Article::getUrl)
+						.collect(Collectors.toList()); //we stream the URLs into a List<String>
+
+				imgURL = articles.stream().filter(article -> Objects.nonNull(article.getUrlToImage())).map(Article::getUrlToImage).collect(Collectors.toList());
+				newsURLs.addAll(imgURL); //images are added to increase the downlaod time
 			}
 
 
@@ -118,6 +127,20 @@ public class Controller {
 		return providerMap.keySet().stream().findFirst().get();
 	}
 
+	public void downloadUrls(Downloader downloader){
+		try {
+			System.out.println(downloader.getClass().toString().substring(14)+" - Heruntergeladen werden: ");
+			Controller.newsURLs.forEach(System.out::println);
+
+			myDownloader = downloader;
+
+			myDownloader.process(Controller.newsURLs);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException f){
+			f.printStackTrace();
+		}
+	}
 
 	public Object getData() {
 		return null;

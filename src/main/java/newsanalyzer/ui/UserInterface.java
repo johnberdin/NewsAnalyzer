@@ -3,6 +3,7 @@ package newsanalyzer.ui;
 //key: 5aa68f2b27a44569822d37332719d59d
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
@@ -12,10 +13,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import newsanalyzer.ctrl.Controller;
-import newsapi.Downloader;
-import newsapi.NewsApi;
-import newsapi.NewsApiBuilder;
-import newsapi.SequentialDownloader;
+import newsapi.*;
 import newsapi.beans.Article;
 import newsapi.beans.NewsReponse;
 import newsapi.enums.Category;
@@ -27,13 +25,13 @@ public class UserInterface
 
 	private Controller ctrl = new Controller();
 
-	SequentialDownloader myDownloader = new SequentialDownloader();
+	Downloader myDownloader = new SequentialDownloader();
 
 	public void getDataFromCtrl1(){
 
 		System.out.println("Aktuellste Nachricht zu Covid (Österreich)");
 
-		ctrl.process("Covid", Category.health); //die Nachrichten werden an den Controller geschickt für die Analyse etc.
+		ctrl.process("corona", Category.health); //die Nachrichten werden an den Controller geschickt für die Analyse etc.
 	}
 
 	public void getDataFromCtrl2(){
@@ -104,11 +102,12 @@ public class UserInterface
 		ctrl.process(keyword, thema); //die Nachrichten werden an den Controller geschickt für die Analyse etc.
 	}
 
-	public void downloadLastSearch(){
-		System.out.println("Heruntergeladen werden: ");
-		Controller.newsURLs.forEach(System.out::println);
-		myDownloader.process(Controller.newsURLs);
+	public void downloadLastSearch1(){
+		ctrl.downloadUrls(new SequentialDownloader());
+	}
 
+	public void downloadLastSearch2(){
+		ctrl.downloadUrls(new ParallelDownloader());
 	}
 
 
@@ -119,7 +118,8 @@ public class UserInterface
 		menu.insert("b", "Aktuellste Nachricht zu Fußball (Österreich)", this::getDataFromCtrl2);
 		menu.insert("c", "Aktuellste Nachricht zu Bitcoin (Österreich)", this::getDataFromCtrl3);
 		menu.insert("d", "Aktuelleste Nachricht zum Thema deiner Wahl",this::getDataForCustomInput);
-		menu.insert("f", "Die letzte Suche herunterladen",this::downloadLastSearch);
+		menu.insert("f", "Die letzten Suchergebnisse herunterladen mit Sequential",this::downloadLastSearch1);
+		menu.insert("g", "Die letzten Suchergebnisse herunterladen mit Parallel",this::downloadLastSearch2);
 		menu.insert("q", "Quit", null);
 		Runnable choice;
 		while ((choice = menu.exec()) != null) {
